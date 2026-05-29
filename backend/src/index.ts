@@ -1,17 +1,16 @@
-import express, { Request, Response } from 'express';
+import app from './app';
+import { testDbConnection } from './config/db';
 
-const app = express();
-const PORT = process.env.PORT || 4000; 
+const PORT = process.env.PORT || 5434;
 
-app.use(express.json());
+const bootstrap = async () => {
+  // 1. Force database connection verification first
+  await testDbConnection();
 
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({ 
-    status: 'healthy',
-    message: 'System core operational.' 
+  // 2. Start the express server only if the database is ready
+  app.listen(PORT, () => {
+    console.log(`🚀 Dedicated backend listening smoothly on http://localhost:${PORT}`);
   });
-});
+};
 
-app.listen(PORT, () => {
-  console.log(`🚀 Dedicated backend listening smoothly on http://localhost:${PORT}`);
-});
+bootstrap();
